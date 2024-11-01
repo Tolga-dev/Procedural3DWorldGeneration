@@ -1,72 +1,75 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class VoronoiDiagram : MonoBehaviour
+namespace WorldGenerators
 {
-    public Vector2Int imageDim;
-    public int regionAmount;
-    private Image _image;
-
-    private void Start()
+    public class VoronoiDiagram : MonoBehaviour
     {
-        _image = GetComponent<Image>();
+        public Vector2Int imageDim;
+        public int regionAmount;
+        private Image _image;
 
-        _image.sprite = Sprite.Create(GenerateVoronoiTexture(), 
-            new Rect(0, 0, imageDim.x, imageDim.y),
-            Vector2.one * 0.5f);
-    }
-
-    Texture2D GenerateVoronoiTexture()
-    {
-        Vector2Int[] centroids = new Vector2Int[regionAmount];
-        Color[] regions = new Color[regionAmount];
-
-        // Initialize centroids and region colors
-        for (int i = 0; i < regionAmount; i++)
+        private void Start()
         {
-            centroids[i] = new Vector2Int(Random.Range(0, imageDim.x), Random.Range(0, imageDim.y));
-            regions[i] = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
+            _image = GetComponent<Image>();
+
+            _image.sprite = Sprite.Create(GenerateVoronoiTexture(), 
+                new Rect(0, 0, imageDim.x, imageDim.y),
+                Vector2.one * 0.5f);
         }
 
-        // Prepare pixel colors for the texture
-        Color[] pixelColors = new Color[imageDim.x * imageDim.y];
-        for (int y = 0; y < imageDim.y; y++)
+        Texture2D GenerateVoronoiTexture()
         {
-            for (int x = 0; x < imageDim.x; x++)
+            Vector2Int[] centroids = new Vector2Int[regionAmount];
+            Color[] regions = new Color[regionAmount];
+
+            // Initialize centroids and region colors
+            for (int i = 0; i < regionAmount; i++)
             {
-                int index = x + y * imageDim.x;
-                pixelColors[index] = regions[GetClosestCentroidIndex(new Vector2Int(x, y), centroids)];
+                centroids[i] = new Vector2Int(Random.Range(0, imageDim.x), Random.Range(0, imageDim.y));
+                regions[i] = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
             }
-        }
 
-        return GetImageFromColorArray(pixelColors);
-    }
-
-    int GetClosestCentroidIndex(Vector2Int pixelPos, Vector2Int[] centroids)
-    {
-        float smallestDst = float.MaxValue;
-        int index = 0;
-        
-        for (int i = 0; i < centroids.Length; i++)
-        {
-            float dist = Vector2.Distance(pixelPos, centroids[i]);
-            if (dist < smallestDst)
+            // Prepare pixel colors for the texture
+            Color[] pixelColors = new Color[imageDim.x * imageDim.y];
+            for (int y = 0; y < imageDim.y; y++)
             {
-                smallestDst = dist;
-                index = i;
+                for (int x = 0; x < imageDim.x; x++)
+                {
+                    int index = x + y * imageDim.x;
+                    pixelColors[index] = regions[GetClosestCentroidIndex(new Vector2Int(x, y), centroids)];
+                }
             }
-        }
-        
-        return index;
-    }
 
-    Texture2D GetImageFromColorArray(Color[] pixelColors)
-    {
-        Texture2D tex = new Texture2D(imageDim.x, imageDim.y);
-        tex.filterMode = FilterMode.Point;
-        tex.SetPixels(pixelColors);
-        tex.Apply();
-        return tex;
+            return GetImageFromColorArray(pixelColors);
+        }
+
+        int GetClosestCentroidIndex(Vector2Int pixelPos, Vector2Int[] centroids)
+        {
+            float smallestDst = float.MaxValue;
+            int index = 0;
+        
+            for (int i = 0; i < centroids.Length; i++)
+            {
+                float dist = Vector2.Distance(pixelPos, centroids[i]);
+                if (dist < smallestDst)
+                {
+                    smallestDst = dist;
+                    index = i;
+                }
+            }
+        
+            return index;
+        }
+
+        Texture2D GetImageFromColorArray(Color[] pixelColors)
+        {
+            Texture2D tex = new Texture2D(imageDim.x, imageDim.y);
+            tex.filterMode = FilterMode.Point;
+            tex.SetPixels(pixelColors);
+            tex.Apply();
+            return tex;
+        }
     }
 }
 
