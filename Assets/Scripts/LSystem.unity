@@ -463,13 +463,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   generationStartPoint: {fileID: 1729084156}
-  sizeOfGridWorld: {x: 10, y: 10}
   offset: 1
-  buildings:
-  - buildingType: 1
-    cellPrefab: {fileID: 3027264780412313630, guid: 1106169bb9787354a88f375642be9afd, type: 3}
-  - buildingType: 0
-    cellPrefab: {fileID: 1902133473773644130, guid: 4cc96138ef8c728428d8abdcc0b6f9b1, type: 3}
+  houseObject: {fileID: 3027264780412313630, guid: 1106169bb9787354a88f375642be9afd, type: 3}
+  tripleRoadObject: {fileID: 5962866701861012061, guid: 315ae3df12eb2cd48be4923c16f3547a, type: 3}
+  forthRoadObject: {fileID: 9024991216101018872, guid: 42168f3369da5d741b4848f69149e780, type: 3}
+  twoRoadObject: {fileID: 1902133473773644130, guid: 4cc96138ef8c728428d8abdcc0b6f9b1, type: 3}
+  cornerRoadObject: {fileID: 9167836805613001921, guid: 50e7e7a62a765c34ca6c22f34f0c28e1, type: 3}
+  sizeOfGridWorld: {x: 7, y: 7}
   buildCells: []
 --- !u!4 &1729084156
 Transform:
