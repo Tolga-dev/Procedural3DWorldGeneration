@@ -7,6 +7,14 @@ The algorithm generates a 2D binary map of a world with road and house tiles wit
 
 
 ---
+## Voronoi Diagram
+
+<p align="center">
+  <img src="GitAsset/f1.png" width="400" height="400" alt="Grid"/>
+  <img src="GitAsset/f2.png" width="400" height="400" alt="Grid"/>
+</p>
+
+---
 
 ## Grid Generation
 

@@ -436,7 +436,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   imageDim: {x: 512, y: 512}
-  regionAmount: 10
+  regionAmount: 5
 --- !u!114 &1743069861
 MonoBehaviour:
   m_ObjectHideFlags: 0
