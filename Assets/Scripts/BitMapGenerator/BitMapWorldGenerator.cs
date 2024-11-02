@@ -24,13 +24,17 @@ namespace BitMapGenerator
         private const int HOUSE_CODE = 0;
         private const int ROAD_CODE = 1;
 
+        private readonly List<float> randRots = new List<float> { 0, 90, 180, 270 };
+        
         private void Start()
         {   
             GenerateWorld();
             PrintWorldGrid();
             VisualizeWorld();
         }
-        
+
+        #region Generate Seed
+
         private void GenerateWorld()
         {
             for (int x = 0; x < sizeOfGridWorld.x; x++)
@@ -71,9 +75,6 @@ namespace BitMapGenerator
 
             return HOUSE_CODE;
         }
-        
-        
-
         private void PlaceRoadsInRow(int rowIndex)
         {
             var maxRoadCount = CalculateMaxReplacements(buildCells[0].cells.Count);
@@ -121,92 +122,103 @@ namespace BitMapGenerator
         {
             return (bitCount % 2 == 0) ? (bitCount / 2) : (bitCount / 2 + 1);
         }
-        
+        #endregion
+
         private void VisualizeWorld()
         {
-            
-            var randRots = new List<float>() {0, 90, 180, 270};
-            
             for (int i = 0; i < buildCells.Count; i++)
             {
                 for (int j = 0; j < buildCells[i].cells.Count; j++)
                 {
                     var code = buildCells[i].cells[j].code;
                     Vector3 spawnPosition = generationStartPoint.position + new Vector3(i * offset, 0, j * offset);
-   
-                    if (code == 0)
+
+                    if (code == HOUSE_CODE)
                     {
-                        var ground = Instantiate(groundObject, spawnPosition, Quaternion.identity);
-                        var house = Instantiate(buildPrefabs[Random.Range(0, buildPrefabs.Count)], ground.transform.position, 
-                            Quaternion.Euler(0,randRots[Random.Range(0, randRots.Count)],0));
+                        GenerateHouse(spawnPosition);
                     }
                     else
                     {
-
-                        bool hasLeftNeighbor = (j > 0) && (buildCells[i].cells[j - 1].code == ROAD_CODE);
-                        bool hasRightNeighbor = (j < buildCells[i].cells.Count - 1) && (buildCells[i].cells[j + 1].code == ROAD_CODE);
-                        bool hasTopNeighbor = (i > 0) && (buildCells[i - 1].cells[j].code == ROAD_CODE);
-                        bool hasBottomNeighbor = (i < buildCells.Count - 1) && (buildCells[i + 1].cells[j].code == ROAD_CODE);
-
-                        int roadNeighbors = (hasLeftNeighbor ? 1 : 0) + (hasRightNeighbor ? 1 : 0) + (hasTopNeighbor ? 1 : 0) + (hasBottomNeighbor ? 1 : 0);
-
-                        if (roadNeighbors == 3)
-                        {
-                            var road = Instantiate(tripleRoadObject, spawnPosition, Quaternion.identity);
-
-                            if (!hasLeftNeighbor) road.transform.rotation = Quaternion.Euler(0, 270, 0);      // "T" shape facing right
-                            else if (!hasRightNeighbor) road.transform.rotation = Quaternion.Euler(0, 90, 0); // "T" shape facing left
-                            else if (!hasTopNeighbor) road.transform.rotation = Quaternion.Euler(0, 0, 0);   // "T" shape facing down
-                            else if (!hasBottomNeighbor) road.transform.rotation = Quaternion.Euler(0, 180, 0); // "T" shape facing up
-                        }
-                        else if (roadNeighbors == 4)
-                        {
-                            var road = Instantiate(forthRoadObject, spawnPosition, Quaternion.identity);
-                            road.transform.rotation = Quaternion.identity; // Cross, no rotation needed
-                        }
-                        else
-                        {
-                            
-                            if (i == 0 && j == 0) // lu
-                            {
-                                var road = Instantiate(cornerRoadObject, spawnPosition, Quaternion.identity);
-                                road.transform.rotation = Quaternion.Euler(0, 90, 0); // Adjust rotation as needed
-                            }
-                            else if (i == 0 && j == buildCells[i].cells.Count - 1) // ru
-                            {
-                                var road = Instantiate(cornerRoadObject, spawnPosition, Quaternion.identity);
-                                road.transform.rotation = Quaternion.Euler(0, 180, 0); // Adjust rotation as needed
-                            }
-                            else if (i == buildCells.Count - 1 && j == 0) // ld
-                            {
-                                var road = Instantiate(cornerRoadObject, spawnPosition, Quaternion.identity);
-                                road.transform.rotation = Quaternion.Euler(0, 0, 0); // Adjust rotation as needed
-                            }
-                            else if (i == buildCells.Count - 1 && j == buildCells[i].cells.Count - 1) // rd
-                            {
-                                var road = Instantiate(cornerRoadObject, spawnPosition, Quaternion.identity);
-                                road.transform.rotation = Quaternion.Euler(0, 270, 0); // Adjust rotation as needed
-                            }
-                            else
-                            {
-                                var road = Instantiate(twoRoadObject, spawnPosition, Quaternion.identity);
-                                bool isRoadRow = (i % 3 == 0);
-                                if (isRoadRow && (j != 0 || j != buildCells[i].cells.Count - 1))
-                                {
-                                    road.transform.rotation = Quaternion.Euler(0,90,0);
-                                }
-                            }
-                        }
+                        GenerateRoad(spawnPosition, i, j);
                     }
                 }
-                
+
             }
-
-
-       
-            
         }
 
+        public void GenerateHouse(Vector3 spawnPosition)
+        {
+            var ground = Instantiate(groundObject, spawnPosition, Quaternion.identity);
+            var house = Instantiate(buildPrefabs[Random.Range(0, buildPrefabs.Count)],
+                ground.transform.position,
+                Quaternion.Euler(0, randRots[Random.Range(0, randRots.Count)], 0));
+        }
+
+        public void GenerateRoad(Vector3 spawnPosition, int i, int j)
+        {
+            bool hasLeftNeighbor = (j > 0) && (buildCells[i].cells[j - 1].code == ROAD_CODE);
+            bool hasRightNeighbor = (j < buildCells[i].cells.Count - 1) && (buildCells[i].cells[j + 1].code == ROAD_CODE);
+            bool hasTopNeighbor = (i > 0) && (buildCells[i - 1].cells[j].code == ROAD_CODE);
+            bool hasBottomNeighbor = (i < buildCells.Count - 1) && (buildCells[i + 1].cells[j].code == ROAD_CODE);
+
+            int roadNeighbors = (hasLeftNeighbor ? 1 : 0) + (hasRightNeighbor ? 1 : 0) +
+                                (hasTopNeighbor ? 1 : 0) + (hasBottomNeighbor ? 1 : 0);
+            
+            if (roadNeighbors == 3)
+            {
+                var road = Instantiate(tripleRoadObject, spawnPosition, Quaternion.identity);
+                if (!hasLeftNeighbor)
+                    road.transform.rotation = Quaternion.Euler(0, 270, 0); // "T" shape facing right
+                else if (!hasRightNeighbor)
+                    road.transform.rotation = Quaternion.Euler(0, 90, 0); // "T" shape facing left
+                else if (!hasTopNeighbor)
+                    road.transform.rotation = Quaternion.Euler(0, 0, 0); // "T" shape facing down
+                else if (!hasBottomNeighbor)
+                    road.transform.rotation = Quaternion.Euler(0, 180, 0); // "T" shape facing up
+            }
+            else if (roadNeighbors == 4)
+            {
+                var road = Instantiate(forthRoadObject, spawnPosition, Quaternion.identity);
+                road.transform.rotation = Quaternion.identity; // Cross, no rotation needed
+            }
+            else
+            {
+                SpawnCornerRoad(spawnPosition, i, j);
+            }
+        }
+
+        private void SpawnCornerRoad(Vector3 spawnPosition, int i, int j)
+        {
+            if (i == 0 && j == 0) // lu
+            {
+                var road = Instantiate(cornerRoadObject, spawnPosition, Quaternion.identity);
+                road.transform.rotation = Quaternion.Euler(0, 90, 0); // Adjust rotation as needed
+            }
+            else if (i == 0 && j == buildCells[i].cells.Count - 1) // ru
+            {
+                var road = Instantiate(cornerRoadObject, spawnPosition, Quaternion.identity);
+                road.transform.rotation = Quaternion.Euler(0, 180, 0); // Adjust rotation as needed
+            }
+            else if (i == buildCells.Count - 1 && j == 0) // ld
+            {
+                var road = Instantiate(cornerRoadObject, spawnPosition, Quaternion.identity);
+                road.transform.rotation = Quaternion.Euler(0, 0, 0); // Adjust rotation as needed
+            }
+            else if (i == buildCells.Count - 1 && j == buildCells[i].cells.Count - 1) // rd
+            {
+                var road = Instantiate(cornerRoadObject, spawnPosition, Quaternion.identity);
+                road.transform.rotation = Quaternion.Euler(0, 270, 0); // Adjust rotation as needed
+            }
+            else
+            {
+                var road = Instantiate(twoRoadObject, spawnPosition, Quaternion.identity);
+                bool isRoadRow = (i % 3 == 0);
+                if (isRoadRow && (j != 0 || j != buildCells[i].cells.Count - 1))
+                {
+                    road.transform.rotation = Quaternion.Euler(0, 90, 0);
+                }
+            }
+        }
 
         private void PrintWorldGrid()
         {
