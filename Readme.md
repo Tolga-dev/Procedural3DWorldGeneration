@@ -25,26 +25,17 @@ The algorithm generates a 2D binary map of a world with road and house tiles wit
 - **Road tiles are generated at intervals (e.g., 0, 3, 6, 9). Corners, crossroads, and T-junctions are dynamically generated.**
 - **All other indexes are generated as house tiles.**
 - **Initial grid example:**
-
-
-- 11111
-- 10001
-- 10001
-- 11111
-
-
+  - 11111
+  - 10001
+  - 10001
+  - 11111
 - **The grid is then refined by selecting specific tiles to make it more natural:**
 - **For instance, modifying a road tile in the center and adjusting the surrounding tiles ensures that roads are fully connected.**
-
 - Refined grid example:
-
-
-- 11111
-- 10101 -> from 10001, after selecting it, then change its bottom index also to 1, so roads will be connected.
-- 10101  
-- 11111
-
-
+  - 11111
+  - 10101 -> from 10001, after selecting it, then change its bottom index also to 1, so roads will be connected.
+  - 10101  
+  - 11111
 - **after generating a grid, then add select a tile in the grid to make it more natural**
 - **that's how the grid is generated.**
 
