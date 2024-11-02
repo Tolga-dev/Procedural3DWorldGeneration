@@ -10,7 +10,7 @@ namespace BitMapGenerator
     {
         public Transform generationStartPoint;
         public float offset;
-        public GameObject houseObject;
+        public GameObject groundObject;
         
         public GameObject tripleRoadObject;
         public GameObject forthRoadObject;
@@ -19,7 +19,8 @@ namespace BitMapGenerator
         
         public Vector2Int sizeOfGridWorld;
         public List<BuildCells> buildCells = new List<BuildCells>();
-
+        public List<GameObject> buildPrefabs = new List<GameObject>();
+        
         private const int HOUSE_CODE = 0;
         private const int ROAD_CODE = 1;
 
@@ -123,6 +124,9 @@ namespace BitMapGenerator
         
         private void VisualizeWorld()
         {
+            
+            var randRots = new List<float>() {0, 90, 180, 270};
+            
             for (int i = 0; i < buildCells.Count; i++)
             {
                 for (int j = 0; j < buildCells[i].cells.Count; j++)
@@ -132,7 +136,9 @@ namespace BitMapGenerator
    
                     if (code == 0)
                     {
-                        var house = Instantiate(houseObject, spawnPosition, Quaternion.identity);
+                        var ground = Instantiate(groundObject, spawnPosition, Quaternion.identity);
+                        var house = Instantiate(buildPrefabs[Random.Range(0, buildPrefabs.Count)], ground.transform.position, 
+                            Quaternion.Euler(0,randRots[Random.Range(0, randRots.Count)],0));
                     }
                     else
                     {
