@@ -36,7 +36,6 @@ The algorithm generates a 2D binary map of a world with road and house tiles wit
   - 10101 -> from 10001, after selecting it, then change its bottom index also to 1, so roads will be connected.
   - 10101  
   - 11111
-- **after generating a grid, then add select a tile in the grid to make it more natural**
 - **that's how the grid is generated.**
 
 <p align="center">
